@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ACD Gamble Game</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h3>Welcome <span id="user"></span></h3>
+    <div class="balance">Balance: <span id="balance"></span> ACD</div>
+
+    <select id="game">
+      <option value="coin">Coin Flip</option>
+      <option value="dice">Dice Roll</option>
+      <option value="slot">Mini Slot</option>
+    </select>
+
+    <input id="bet" type="number" placeholder="Bet ACD">
+    <button onclick="play()">Play</button>
+
+    <p id="result"></p>
+    <button onclick="logout()">Logout</button>
+
+    <h3>Leaderboard</h3>
+    <ol id="leader"></ol>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

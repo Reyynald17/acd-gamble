@@ -1,0 +1,50 @@
+:root {
+  --dark: #213448;
+  --mid: #547792;
+  --light: #94B4C1;
+  --gold: #D4AF37;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--dark);
+  color: var(--light);
+}
+
+.container {
+  max-width: 420px;
+  margin: 60px auto;
+  padding: 24px;
+  background: var(--mid);
+  border-radius: 10px;
+}
+
+h2, h3 {
+  text-align: center;
+  color: var(--gold);
+}
+
+input, button, select {
+  width: 100%;
+  margin: 8px 0;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+}
+
+button {
+  background: var(--gold);
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.warning {
+  color: #ff8080;
+  font-size: 14px;
+}
+
+.balance {
+  font-size: 18px;
+  text-align: center;
+}
