@@ -10,21 +10,16 @@
     <div class="balance">Balance: <span id="balance"></span> ACD</div>
 
     <div id="visual-container" class="visual-box">
-      <div id="visual-element">?</div>
-    </div>
+      </div>
 
-    <select id="game" onchange="toggleCoinSide()">
+    <select id="game" onchange="updateUI()">
       <option value="coin">Coin Flip</option>
       <option value="dice">Dice Roll</option>
       <option value="slot">Mini Slot</option>
     </select>
 
-    <div id="coin-side-container">
-      <select id="coin-side">
-        <option value="heads">Heads (🟡)</option>
-        <option value="tails">Tails (⚪)</option>
-      </select>
-    </div>
+    <div id="selection-container">
+      </div>
 
     <input id="bet" type="number" placeholder="Bet ACD">
     <button onclick="play()">Play</button>
