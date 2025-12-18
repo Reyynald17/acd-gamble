@@ -48,3 +48,25 @@ button {
   font-size: 18px;
   text-align: center;
 }
+.visual-box {
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--dark);
+  margin: 15px 0;
+  border-radius: 8px;
+  border: 2px solid var(--gold);
+  font-size: 40px;
+  overflow: hidden;
+}
+
+#visual-element.spinning {
+  animation: spin 0.1s infinite linear;
+}
+
+@keyframes spin {
+  0% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.5; }
+}
