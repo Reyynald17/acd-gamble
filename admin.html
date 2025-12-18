@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard - Smart Sync</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .admin-container { max-width: 900px; margin: 30px auto; padding: 20px; background: var(--mid); border-radius: 10px; }
+    table { width: 100%; border-collapse: collapse; background: var(--dark); border-radius: 8px; overflow: hidden; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #3d5a73; }
+    th { background: var(--gold); color: var(--dark); }
+    .status-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+    .active { background: #00ff00; color: #000; }
+    .paused { background: #ff8080; color: #fff; }
+    .row-update { animation: highlight 2s ease-out; }
+    @keyframes highlight {
+      0% { background-color: rgba(212, 175, 55, 0.5); }
+      100% { background-color: transparent; }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-container">
+    <div class="status-bar">
+      <h3>Admin Control Center</h3>
+      <div id="sync-status" class="badge paused">IDLE</div>
+    </div>
+    
+    <div id="api-status" style="font-size: 12px; margin-bottom: 10px; color: var(--gold);">Sync paused.</div>
+    
+    <table>
+      <thead>
+        <tr>
+          <th>User ID</th>
+          <th>Balance</th>
+          <th>Activity</th>
+        </tr>
+      </thead>
+      <tbody id="admin-table"></tbody>
+    </table>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script>
+    let previousState = {};
+    let syncInterval = null;
+
+    async function fetchData() {
+      try {
+        const data = await getData();
+        const currentUsers = data.users;
+        const tableBody = document.getElementById("admin-table");
+        
+        tableBody.innerHTML = "";
+        
+        for (const [userId, profile] of Object.entries(currentUsers)) {
+          let rowClass = "";
+          if (previousState[userId] && previousState[userId].balance !== profile.balance) {
+            rowClass = "row-update";
+          }
+
+          tableBody.innerHTML += `
+            <tr class="${rowClass}">
+              <td><strong>${userId}</strong></td>
+              <td>${profile.balance} ACD</td>
+              <td style="font-size: 11px;">${rowClass ? 'Recently Updated' : 'No Change'}</td>
+            </tr>
+          `;
+        }
+
+        previousState = JSON.parse(JSON.stringify(currentUsers));
+        document.getElementById("api-status").innerText = "Last Sync: " + new Date().toLocaleTimeString();
+      } catch (err) {
+        document.getElementById("api-status").innerText = "Error: Rate limit or connection issue.";
+      }
+    }
+
+    function startSync() {
+      if (!syncInterval) {
+        fetchData(); // Ambil data segera saat dibuka
+        syncInterval = setInterval(fetchData, 7000); // Interval 7 detik untuk keamanan kuota
+        const badge = document.getElementById("sync-status");
+        badge.innerText = "LIVE SCANNING";
+        badge.className = "badge active";
+      }
+    }
+
+    function stopSync() {
+      clearInterval(syncInterval);
+      syncInterval = null;
+      const badge = document.getElementById("sync-status");
+      badge.innerText = "SYNC PAUSED";
+      badge.className = "badge paused";
+      document.getElementById("api-status").innerText = "Sync paused to save requests.";
+    }
+
+    // Mendeteksi apakah tab sedang dilihat atau disembunyikan
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        stopSync();
+      } else {
+        startSync();
+      }
+    });
+
+    // Inisialisasi saat pertama kali load
+    startSync();
+  </script>
+</body>
+</html>
