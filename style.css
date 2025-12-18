@@ -49,7 +49,7 @@ button {
   text-align: center;
 }
 .visual-box {
-  height: 100px;
+  height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -57,8 +57,43 @@ button {
   margin: 15px 0;
   border-radius: 8px;
   border: 2px solid var(--gold);
+  font-size: 50px;
+}
+
+.dice-visual {
+  background: white;
+  color: black;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-weight: bold;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+}
+
+.slot-machine {
+  display: flex;
+  gap: 10px;
   font-size: 40px;
-  overflow: hidden;
+}
+
+.slot-reel {
+  background: #eee;
+  padding: 5px 10px;
+  border-radius: 4px;
+  border: 2px solid #444;
+}
+
+.spinning {
+  animation: blur 0.1s infinite;
+}
+
+@keyframes blur {
+  0% { filter: blur(0px); transform: translateY(-2px); }
+  50% { filter: blur(4px); transform: translateY(2px); }
+  100% { filter: blur(0px); transform: translateY(-2px); }
 }
 
 #visual-element.spinning {
