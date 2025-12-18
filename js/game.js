@@ -7,6 +7,7 @@ const betInput = document.getElementById("bet");
 const result = document.getElementById("result");
 const leader = document.getElementById("leader");
 const game = document.getElementById("game");
+const visual = document.getElementById("visual-element");
 
 let data, balance;
 
@@ -22,10 +23,30 @@ async function play() {
   const bet = Number(betInput.value);
   if (bet <= 0 || bet > balance) return alert("Bet tidak valid");
 
+  visual.classList.add("spinning");
+  result.innerText = "Processing...";
+  
+  await new Promise(r => setTimeout(r, 800));
+
   let win = false;
-  if (game.value === "coin") win = Math.random() < 0.5;
-  if (game.value === "dice") win = Math.random() < 1/6;
-  if (game.value === "slot") win = Math.random() < 0.2;
+  let icon = "";
+
+  if (game.value === "coin") {
+    win = Math.random() < 0.5;
+    icon = win ? "🟡 (HEADS)" : "⚪ (TAILS)";
+  } else if (game.value === "dice") {
+    const side = Math.floor(Math.random() * 6) + 1;
+    win = side === 6;
+    icon = `🎲 ${side}`;
+  } else if (game.value === "slot") {
+    const slots = ["🍒", "🍋", "💎"];
+    const res = [slots[Math.floor(Math.random()*3)], slots[Math.floor(Math.random()*3)], slots[Math.floor(Math.random()*3)]];
+    win = res[0] === res[1] && res[1] === res[2];
+    icon = res.join("");
+  }
+
+  visual.classList.remove("spinning");
+  visual.innerText = icon;
 
   balance += win ? bet : -bet;
   data.users[user].balance = balance;
@@ -33,6 +54,7 @@ async function play() {
 
   balanceSpan.innerText = balance;
   result.innerText = win ? "WIN" : "LOSE";
+  result.style.color = win ? "#00ff00" : "#ff8080";
   updateLeaderboard();
 }
 
