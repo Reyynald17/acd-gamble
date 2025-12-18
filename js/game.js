@@ -8,6 +8,8 @@ const result = document.getElementById("result");
 const leader = document.getElementById("leader");
 const game = document.getElementById("game");
 const visual = document.getElementById("visual-element");
+const coinSideContainer = document.getElementById("coin-side-container");
+const coinSideSelect = document.getElementById("coin-side");
 
 let data, balance;
 
@@ -17,7 +19,12 @@ let data, balance;
   userSpan.innerText = user;
   balanceSpan.innerText = balance;
   updateLeaderboard();
+  toggleCoinSide();
 })();
+
+function toggleCoinSide() {
+  coinSideContainer.style.display = game.value === "coin" ? "block" : "none";
+}
 
 async function play() {
   const bet = Number(betInput.value);
@@ -32,8 +39,10 @@ async function play() {
   let icon = "";
 
   if (game.value === "coin") {
-    win = Math.random() < 0.5;
-    icon = win ? "🟡 (HEADS)" : "⚪ (TAILS)";
+    const outcome = Math.random() < 0.5 ? "heads" : "tails";
+    const userChoice = coinSideSelect.value;
+    win = outcome === userChoice;
+    icon = outcome === "heads" ? "🟡 (HEADS)" : "⚪ (TAILS)";
   } else if (game.value === "dice") {
     const side = Math.floor(Math.random() * 6) + 1;
     win = side === 6;
