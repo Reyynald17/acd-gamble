@@ -7,9 +7,7 @@ const betInput = document.getElementById("bet");
 const result = document.getElementById("result");
 const leader = document.getElementById("leader");
 const game = document.getElementById("game");
-const visual = document.getElementById("visual-element");
-const coinSideContainer = document.getElementById("coin-side-container");
-const coinSideSelect = document.getElementById("coin-side");
+const visualContainer = document.getElementById("visual-container");
 
 let data, balance;
 
@@ -19,43 +17,55 @@ let data, balance;
   userSpan.innerText = user;
   balanceSpan.innerText = balance;
   updateLeaderboard();
-  toggleCoinSide();
 })();
-
-function toggleCoinSide() {
-  coinSideContainer.style.display = game.value === "coin" ? "block" : "none";
-}
 
 async function play() {
   const bet = Number(betInput.value);
   if (bet <= 0 || bet > balance) return alert("Bet tidak valid");
 
-  visual.classList.add("spinning");
-  result.innerText = "Processing...";
-  
-  await new Promise(r => setTimeout(r, 800));
-
+  result.innerText = "Rolling...";
   let win = false;
-  let icon = "";
+  const gameType = game.value;
 
-  if (game.value === "coin") {
+  if (gameType === "coin") {
+    visualContainer.innerHTML = `<div class="spinning">🟡</div>`;
+    await new Promise(r => setTimeout(r, 600));
     const outcome = Math.random() < 0.5 ? "heads" : "tails";
-    const userChoice = coinSideSelect.value;
+    const userChoice = document.getElementById("coin-side").value;
     win = outcome === userChoice;
-    icon = outcome === "heads" ? "🟡 (HEADS)" : "⚪ (TAILS)";
-  } else if (game.value === "dice") {
+    visualContainer.innerHTML = `<div>${outcome === "heads" ? "🟡" : "⚪"}</div>`;
+  } 
+  
+  else if (gameType === "dice") {
+    visualContainer.innerHTML = `<div class="dice-visual spinning">?</div>`;
+    await new Promise(r => setTimeout(r, 800));
     const side = Math.floor(Math.random() * 6) + 1;
     win = side === 6;
-    icon = `🎲 ${side}`;
-  } else if (game.value === "slot") {
-    const slots = ["🍒", "🍋", "💎"];
-    const res = [slots[Math.floor(Math.random()*3)], slots[Math.floor(Math.random()*3)], slots[Math.floor(Math.random()*3)]];
+    visualContainer.innerHTML = `<div class="dice-visual">${side}</div>`;
+  } 
+  
+  else if (gameType === "slot") {
+    visualContainer.innerHTML = `
+      <div class="slot-machine">
+        <div class="slot-reel spinning">❓</div>
+        <div class="slot-reel spinning">❓</div>
+        <div class="slot-reel spinning">❓</div>
+      </div>`;
+    await new Promise(r => setTimeout(r, 1000));
+    const symbols = ["🍒", "🍋", "💎", "🔔"];
+    const res = [
+      symbols[Math.floor(Math.random() * symbols.length)],
+      symbols[Math.floor(Math.random() * symbols.length)],
+      symbols[Math.floor(Math.random() * symbols.length)]
+    ];
     win = res[0] === res[1] && res[1] === res[2];
-    icon = res.join("");
+    visualContainer.innerHTML = `
+      <div class="slot-machine">
+        <div class="slot-reel">${res[0]}</div>
+        <div class="slot-reel">${res[1]}</div>
+        <div class="slot-reel">${res[2]}</div>
+      </div>`;
   }
-
-  visual.classList.remove("spinning");
-  visual.innerText = icon;
 
   balance += win ? bet : -bet;
   data.users[user].balance = balance;
