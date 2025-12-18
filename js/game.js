@@ -7,7 +7,8 @@ const betInput = document.getElementById("bet");
 const result = document.getElementById("result");
 const leader = document.getElementById("leader");
 const game = document.getElementById("game");
-const visualContainer = document.getElementById("visual-container");
+const visualBox = document.getElementById("visual-container");
+const selectionContainer = document.getElementById("selection-container");
 
 let data, balance;
 
@@ -17,60 +18,78 @@ let data, balance;
   userSpan.innerText = user;
   balanceSpan.innerText = balance;
   updateLeaderboard();
+  updateUI();
 })();
+
+function updateUI() {
+  const mode = game.value;
+  selectionContainer.innerHTML = "";
+  
+  if (mode === "coin") {
+    visualBox.innerHTML = `<div class="coin" id="v-obj">COIN</div>`;
+    selectionContainer.innerHTML = `
+      <select id="user-choice">
+        <option value="heads">Heads (🟡)</option>
+        <option value="tails">Tails (⚪)</option>
+      </select>`;
+  } else if (mode === "dice") {
+    visualBox.innerHTML = `<div class="dice-box" id="v-obj">?</div>`;
+    selectionContainer.innerHTML = `
+      <select id="user-choice">
+        ${[1,2,3,4,5,6].map(n => `<option value="${n}">${n}</option>`).join('')}
+      </select>`;
+  } else if (mode === "slot") {
+    visualBox.innerHTML = `
+      <div class="slot-container">
+        <div class="reel" id="r1">?</div>
+        <div class="reel" id="r2">?</div>
+        <div class="reel" id="r3">?</div>
+      </div>`;
+  }
+}
 
 async function play() {
   const bet = Number(betInput.value);
   if (bet <= 0 || bet > balance) return alert("Bet tidak valid");
 
-  result.innerText = "Rolling...";
+  const mode = game.value;
   let win = false;
-  const gameType = game.value;
 
-  if (gameType === "coin") {
-    visualContainer.innerHTML = `<div class="spinning">🟡</div>`;
-    await new Promise(r => setTimeout(r, 600));
-    const outcome = Math.random() < 0.5 ? "heads" : "tails";
-    const userChoice = document.getElementById("coin-side").value;
-    win = outcome === userChoice;
-    visualContainer.innerHTML = `<div>${outcome === "heads" ? "🟡" : "⚪"}</div>`;
-  } 
-  
-  else if (gameType === "dice") {
-    visualContainer.innerHTML = `<div class="dice-visual spinning">?</div>`;
-    await new Promise(r => setTimeout(r, 800));
-    const side = Math.floor(Math.random() * 6) + 1;
-    win = side === 6;
-    visualContainer.innerHTML = `<div class="dice-visual">${side}</div>`;
-  } 
-  
-  else if (gameType === "slot") {
-    visualContainer.innerHTML = `
-      <div class="slot-machine">
-        <div class="slot-reel spinning">❓</div>
-        <div class="slot-reel spinning">❓</div>
-        <div class="slot-reel spinning">❓</div>
-      </div>`;
+  if (mode === "coin") {
+    const obj = document.getElementById("v-obj");
+    obj.classList.add("spinning");
     await new Promise(r => setTimeout(r, 1000));
-    const symbols = ["🍒", "🍋", "💎", "🔔"];
-    const res = [
-      symbols[Math.floor(Math.random() * symbols.length)],
-      symbols[Math.floor(Math.random() * symbols.length)],
-      symbols[Math.floor(Math.random() * symbols.length)]
-    ];
+    const outcome = Math.random() < 0.5 ? "heads" : "tails";
+    win = outcome === document.getElementById("user-choice").value;
+    obj.classList.remove("spinning");
+    obj.innerText = outcome === "heads" ? "🟡" : "⚪";
+  } 
+  
+  else if (mode === "dice") {
+    const obj = document.getElementById("v-obj");
+    obj.classList.add("rolling");
+    await new Promise(r => setTimeout(r, 1000));
+    const outcome = Math.floor(Math.random() * 6) + 1;
+    win = outcome === Number(document.getElementById("user-choice").value);
+    obj.classList.remove("rolling");
+    obj.innerText = outcome;
+  } 
+  
+  else if (mode === "slot") {
+    const r1 = document.getElementById("r1"), r2 = document.getElementById("r2"), r3 = document.getElementById("r3");
+    r1.classList.add("spinning"); r2.classList.add("spinning"); r3.classList.add("spinning");
+    await new Promise(r => setTimeout(r, 1200));
+    const sym = ["🍒", "💎", "7️⃣"];
+    const res = [sym[Math.floor(Math.random()*3)], sym[Math.floor(Math.random()*3)], sym[Math.floor(Math.random()*3)]];
     win = res[0] === res[1] && res[1] === res[2];
-    visualContainer.innerHTML = `
-      <div class="slot-machine">
-        <div class="slot-reel">${res[0]}</div>
-        <div class="slot-reel">${res[1]}</div>
-        <div class="slot-reel">${res[2]}</div>
-      </div>`;
+    r1.classList.remove("spinning"); r2.classList.remove("spinning"); r3.classList.remove("spinning");
+    r1.innerText = res[0]; r2.innerText = res[1]; r3.innerText = res[2];
   }
 
-  balance += win ? bet : -bet;
+  balance += win ? (mode === "slot" ? bet * 5 : bet) : -bet;
   data.users[user].balance = balance;
   await saveData(data);
-
+  
   balanceSpan.innerText = balance;
   result.innerText = win ? "WIN" : "LOSE";
   result.style.color = win ? "#00ff00" : "#ff8080";
